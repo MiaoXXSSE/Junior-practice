@@ -1,0 +1,88 @@
+计算过程：
+文法对应的拓广文法为：
+1	S -> E
+2 	E -> E+T
+3 	E -> E-T
+4 	E -> T
+5 	T -> T*F
+6 	T -> T/F
+7 	T -> F
+8 	F -> (E)
+9 	F -> id
+10 	F -> num
+
+求的各个非终结符的FIRST、FOLLOW集合为：
+FIRST(S) =  { id, num, ( }	FOLLOW (S) =  { $ }
+FIRST(E) =  { id, num, ( }	FOLLOW (E) =  { $ , + , - , ) }
+FIRST(T) =  { id, num, ( } 	FOLLOW (T) =  { $ , + , - , * , / , ) }
+FIRST(F) =  { id, num, ( } 	FOLLOW (F) =  { $ , + , - , * , / , ) }
+
+构造项目集规范族：
+I0 = closure({S->·E}) = {S->·E, E->·E+T, E->·E-T, E->·T, T->·T*F, T->·T/F, T->·F, F->·id, F->·(E), F->·num};
+从I0出发：
+I1 = go(I0, E) = closure({S->E·, E->E·+T, E->E·-T}) = {S->E·, E->E·+T, E->E·-T};
+I2 = go(I0, T) = closure({E->T·, T->T·*F, T->T·/F}) = {E->T·, T->T·*F, T->T·/F};
+I3 = go(I0, F) = closure({T->F·}) = {T->F·};
+I4 = go(I0, id) = closure({F->id·}) = {F->id·};
+I5 = go(I0, () = closure({F->(·E)}) = {F->(·E), E->·E+T, E->·E-T, E->·T, T->·T*F, T->·T/F, T->·F, F->·id, F->·(E), F->·num};
+I6 = go(I0, num) = closure({F->num·}) = {F->num·};
+从I1出发：
+I7 = go(I1, +) = closure({E->E+·T}) = {E->E+·T, T->·T*F, T->·T/F, T->·F, F->·id, F->·(E), F->·num};
+I8 = go(I1, -) = closure({E->E-·T}) = {E->E-·T, T->·T*F, T->·T/F, T->·F, F->·id, F->·(E), F->·num};
+从I2出发：
+I9 = go(I2, *) = closure({T->T*·F}) = {T->T*·F, F->·id, F->·(E), F->·num};
+I10 = go(I2, /) = closure({T->T/·F}) = {T->T/·F, F->·id, F->(E), F->·num};
+从I5出发：
+I11 = go(I5, E) = closure({F->(E·), E->E·+T, E->E·-T}) = {F->(E·), E->E·+T, E->E·-T};
+从I7出发：
+I12 = go(I7, T) = closure({E->E+T·, T->T·*F, T->T·/F}) = {E->E+T·, T->T·*F, T->T·/F};
+从I8出发：
+I13 = go(I8, T) = closure({E->E-T·, T->T·*F, T->T·/F}) = {E->E-T·, T->T·*F, T->T·/F};
+从I9出发：
+I14 = go(I9, F) = closure({T->T*F·}) = {T->T*F·};
+从I10出发：
+I15 = go(I10, F) = closure({T->T/F·}) = {T->T/F·};
+从I11出发：
+I16 = go(I11, )) = closure({F->(E)·}) = {F->(E)·};
+
+下面构造文法的LR分析表：
+goto[0,E] = 1; goto[0,T] = 2; goto[0,F] = 3;
+action[0,id] = S4; action[0,(] = S5; action[0,num] = S6;
+
+action[1,$] = ACC.; action[1,+] = S7; action[1,-] = S8;
+;
+action[2,)] = action[2,+] = action[2,-] = action[2,$] = R4;
+action[2,*] = S9; action[2,/] = S10;
+
+action[3,)] = action[3,+] = action[3,-] = action[3,*] = action[3,/] = action[3,$] = R7;
+
+action[4,)] = action[4,+] = action[4,-] = action[4,*] = action[4,/] = action[4,$] = R8;
+
+goto[5,E] = 11; goto[5,T] = 2; goto[5,F] = 3;
+action[5,id] = S4; action[5,(] = S5; action[5,num] = S6;
+
+action[6,)] = action[6,+] = action[6,-] = action[6,*] = action[6,/] = action[6,$] = R10;
+
+goto[7,T] = 12; goto[7,F] = 3;
+action[7,id] = S4; action[7,(] = S5; action[7,num] = S6;
+
+goto[8,T] = 13; goto[8,F] = 3;
+action[8,id] = S4; action[8,(] = S5; action[8,num] = S6;
+
+goto[9,F] = 14;
+action[9,id] = S4; action[9,(] = S5; action[9,num] = S6;
+
+goto[10,F] = 15;
+action[10,id] = S4; action[10,(] = S5; action[10,num] = S6;
+
+action[11,)] = S16; action[11,+] = S7; action[11,-] = S8;
+
+action[12,)] = action[12,+] = action[12,-] = action[12,$] = R2; action[12,*] = S9; action[12,/] = S10;
+
+action[13,)] = action[13,+] = action[13,-] = action[13,$] = R3; action[13,*] = S9; action[13,/] = S10;
+
+action[14,)] = action[14,+] = action[14,-] = action[14,*] = action[14,/] = action[14,$] = R5;
+
+action[15,)] = action[15,+] = action[15,-] = action[15,*] = action[15,/] = action[15,$] = R6;
+
+action[16,)] = action[16,+] = action[16,-] = action[16,*] = action[16,/] = action[16,$] = R9;

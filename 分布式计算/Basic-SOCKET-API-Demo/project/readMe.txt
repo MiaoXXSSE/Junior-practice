@@ -1,0 +1,2 @@
+压缩包中：FenbushiJisuanLab01为客户端程序，为MyEclipse的工程
+Fenbushijisuanlab01Server为服务器端程序，为eclipse的工程
